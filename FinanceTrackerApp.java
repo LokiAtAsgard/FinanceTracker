@@ -1,32 +1,35 @@
-import javax.swing.*;
-import java.awt.*;
-import java.util.ArrayList;
+private JPanel createFinanceTrackerPanel() {
+    JPanel trackerPanel = new JPanel(new BorderLayout());
+    trackerPanel.setBackground(new Color(40, 40, 40));
 
-public class FinanceTrackerApp {
-    private JFrame mainFrame;
-    private JPanel contentPanel;
-    private CardLayout panelSwitcher;
+    expenseSections = new ArrayList<>();
+    trackerDetailsPanel = new JPanel();
+    trackerDetailsPanel.setLayout(new BoxLayout(trackerDetailsPanel, BoxLayout.Y_AXIS));
+    trackerDetailsPanel.setBackground(new Color(50, 50, 50));
 
-    public FinanceTrackerApp() {
-        mainFrame = new JFrame("Finance Tracker");
-        Image icon = Toolkit.getDefaultToolkit().getImage("resources/LogoFinance.png");
-        mainFrame.setIconImage(icon);
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainFrame.setSize(650, 400);
-        mainFrame.setLayout(new BorderLayout());
+    JScrollPane scrollPane = new JScrollPane(trackerDetailsPanel);
+    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-        panelSwitcher = new CardLayout();
-        contentPanel = new JPanel(panelSwitcher);
+    JButton addSectionButton = createHoverableButton("Add Month of Expenses");
+    JButton deleteSectionButton = createHoverableButton("Delete Last Month");
+    JButton submitButton = createHoverableButton("Submit");
 
-        JPanel menuPanel = createMainMenuPanel();
-        JPanel financeTrackerPanel = createFinanceTrackerPanel();
-        JPanel calculatorPanel = createCalculatorPanel();
+    addSectionButton.addActionListener(event -> addExpenseSection());
+    deleteSectionButton.addActionListener(event -> deleteLastExpenseSection());
+    submitButton.addActionListener(event -> submitExpenseDetails());
 
-        contentPanel.add(menuPanel, "Main Menu");
-        contentPanel.add(financeTrackerPanel, "Finance Tracker");
-        contentPanel.add(calculatorPanel, "Calculator");
+    JPanel buttonPanel = new JPanel(new GridLayout(1, 3, 10, 10));
+    buttonPanel.add(addSectionButton);
+    buttonPanel.add(deleteSectionButton);
+    buttonPanel.add(submitButton);
 
-        mainFrame.add(contentPanel, BorderLayout.CENTER);
-        mainFrame.setVisible(true);
-    }
+    trackerPanel.add(scrollPane, BorderLayout.CENTER);
+    trackerPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+    JButton backToMenuButton = createHoverableButton("Back to Main Menu");
+    backToMenuButton.addActionListener(event -> navigateToPanel("Main Menu"));
+    trackerPanel.add(backToMenuButton, BorderLayout.NORTH);
+
+    return trackerPanel;
 }
