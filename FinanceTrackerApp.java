@@ -1,5 +1,11 @@
 
 
+import javax.swing.*; // Provides classes for building a GUI, e.g., JFrame, JButton
+import javax.swing.border.TitledBorder; // Enables titled borders around panels
+import java.awt.*; // Provides layout managers and UI styling components
+import java.awt.event.*; // Handles events such as button clicks
+import java.util.ArrayList; // Implements a dynamic resizable array for storing data
+
 private void deleteLastExpenseSection() { // Deletes the most recently added expense section
     if (!expenseSections.isEmpty()) { // Checks if there are sections to delete
         JPanel lastSection = expenseSections.remove(expenseSections.size() - 1); // Removes the last section
