@@ -1,57 +1,46 @@
-import javax.swing.*; // Provides classes for building a GUI, e.g., JFrame, JButton
-import javax.swing.border.TitledBorder; // Enables titled borders around panels
-import java.awt.*; // Provides layout managers and UI styling components
-import java.awt.event.*; // Handles events such as button clicks
-import java.util.ArrayList; // Implements a dynamic resizable array for storing data
+    private JButton createHoverableButton(String text) { // Creates a styled button with hover effects
+        JButton button = new JButton(text); // Initializes the button with the provided text
 
-public class FinanceTrackerApp { // Defines the main class of the Finance Tracker application
-    private JFrame mainFrame; // Main application window
-    private JPanel contentPanel; // Container to hold different panels for navigation
-    private CardLayout panelSwitcher; // Manages panel switching within contentPanel
+        button.setBackground(new Color(40, 40, 40)); // Sets the default background color
+        button.setForeground(Color.WHITE); // Sets the default text color
+        button.setFont(new Font("Arial", Font.BOLD, 14)); // Sets the font style and size
+        button.setFocusPainted(false); // Disables focus painting for cleaner look
+        button.setBorder(BorderFactory.createLineBorder(new Color(220, 20, 60), 2)); // Adds a border with red color
 
-    private ArrayList<JPanel> expenseSections; // Stores individual expense sections dynamically
-    private JPanel trackerDetailsPanel; // Panel to display all expense sections in a scrollable view
+        button.addMouseListener(new MouseAdapter() { // Adds a listener for mouse hover events
+            @Override
+            public void mouseEntered(MouseEvent e) { // When the mouse hovers over the button
+                button.setBackground(new Color(220, 20, 60)); // Changes the background color to red
+                button.setForeground(Color.BLACK); // Changes the text color to black
+            }
 
-    public FinanceTrackerApp() { // Constructor to initialize the application's GUI components
-        mainFrame = new JFrame("Finance Tracker"); // Creates the main application window
-        Image icon = Toolkit.getDefaultToolkit().getImage( // Loads the application icon
-        new java.io.File("C:\\ElexisEonClark\\College\\College gawain\\Second Year\\Object Oriented Programming\\Project\\resources\\LogoFinance.png").getAbsolutePath());
-        mainFrame.setIconImage(icon); // Sets the application icon
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Closes the app on exit
-        mainFrame.setSize(650, 400); // Sets the size of the main frame
-        mainFrame.setLayout(new BorderLayout()); // Sets the layout manager for the main frame
+            @Override
+            public void mouseExited(MouseEvent e) { // When the mouse leaves the button
+                button.setBackground(new Color(40, 40, 40)); // Resets the background color
+                button.setForeground(Color.WHITE); // Resets the text color
+            }
+        });
 
-        panelSwitcher = new CardLayout(); // Initializes the CardLayout for switching panels
-        contentPanel = new JPanel(panelSwitcher); // Creates the content panel with CardLayout
-
-        JPanel menuPanel = createMainMenuPanel(); // Creates the main menu panel
-        JPanel financeTrackerPanel = createFinanceTrackerPanel(); // Creates the finance tracker panel
-        JPanel calculatorPanel = createCalculatorPanel(); // Creates the calculator panel
-
-        contentPanel.add(menuPanel, "Main Menu"); // Adds the main menu to the content panel
-        contentPanel.add(financeTrackerPanel, "Finance Tracker"); // Adds the tracker panel
-        contentPanel.add(calculatorPanel, "Calculator"); // Adds the calculator panel
-
-        mainFrame.add(contentPanel, BorderLayout.CENTER); // Adds contentPanel to the frame
-        mainFrame.setVisible(true); // Makes the main frame visible
+        return button; // Returns the styled button
     }
 
-    private JPanel createMainMenuPanel() { // Creates the main menu panel
-        JPanel mainMenuPanel = new JPanel(); // Initializes the main menu panel
-        mainMenuPanel.setLayout(new GridLayout(3, 1, 10, 10)); // Sets a grid layout for buttons
-        mainMenuPanel.setBackground(new Color(30, 30, 30)); // Sets the background color
-
-        JButton financeTrackerButton = createHoverableButton("Track My Finances"); // Button for finance tracker
-        JButton calculatorButton = createHoverableButton("Calculate on your Own"); // Button for calculator
-        JButton exitButton = createHoverableButton("Exit"); // Button to exit the app
-
-        financeTrackerButton.addActionListener(event -> navigateToPanel("Finance Tracker")); // Navigates to tracker
-        calculatorButton.addActionListener(event -> navigateToPanel("Calculator")); // Navigates to calculator
-        exitButton.addActionListener(event -> confirmExit()); // Exits the application
-
-        mainMenuPanel.add(financeTrackerButton); // Adds the tracker button to the menu
-        mainMenuPanel.add(calculatorButton); // Adds the calculator button
-        mainMenuPanel.add(exitButton); // Adds the exit button
-
-        return mainMenuPanel; // Returns the main menu panel
+    private void navigateToPanel(String panelName) { // Switches the view to a specified panel
+        panelSwitcher.show(contentPanel, panelName); // Uses CardLayout to switch to the target panel
     }
+
+    private void confirmExit() { // Displays a confirmation dialog before exiting the application
+        int choice = JOptionPane.showConfirmDialog( // Shows a Yes/No dialog
+            mainFrame, 
+            "Are you sure you want to exit?", 
+            "Exit Confirmation", 
+            JOptionPane.YES_NO_OPTION
+        );
+        if (choice == JOptionPane.YES_OPTION) { // If the user confirms exit
+            System.exit(0); // Terminates the application
+        }
+    }
+
+    public static void main(String[] args) { // Entry point of the application
+        SwingUtilities.invokeLater(FinanceTrackerApp::new); // Launches the application on the Event Dispatch Thread
+    }
+}
