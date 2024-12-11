@@ -81,12 +81,3 @@ private JPanel createCalculatorPanel() { // Creates the calculator panel
         button.addActionListener(calculatorListener); // Adds the ActionListener
         buttonPanel.add(button); // Adds the button to the panel
     }
-
-    JButton backToMenuButton = createHoverableButton("Back to Main Menu"); // Button to return to main menu
-    backToMenuButton.addActionListener(event -> navigateToPanel("Main Menu")); // Navigates to the main menu
-
-    calculatorPanel.add(display, BorderLayout.NORTH); // Adds the display to the top
-    calculatorPanel.add(buttonPanel, BorderLayout.CENTER); // Adds the buttons to the center
-    calculatorPanel.add(backToMenuButton, BorderLayout.SOUTH); // Adds the back button to the bottom
-
-    return calculatorPanel; // Returns the calculator panel
