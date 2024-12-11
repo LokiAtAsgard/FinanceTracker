@@ -1,19 +1,75 @@
-private JPanel createMainMenuPanel() {
-    JPanel mainMenuPanel = new JPanel();
-    mainMenuPanel.setLayout(new GridLayout(3, 1, 10, 10));
-    mainMenuPanel.setBackground(new Color(30, 30, 30));
+private JPanel createCalculatorPanel() {
+    JPanel calculatorPanel = new JPanel(new BorderLayout());
 
-    JButton financeTrackerButton = createHoverableButton("Track My Finances");
-    JButton calculatorButton = createHoverableButton("Calculate on your Own");
-    JButton exitButton = createHoverableButton("Exit");
+    JTextField display = new JTextField();
+    display.setEditable(false);
+    display.setHorizontalAlignment(JTextField.RIGHT);
+    display.setFont(new Font("Arial", Font.BOLD, 24));
 
-    financeTrackerButton.addActionListener(event -> navigateToPanel("Finance Tracker"));
-    calculatorButton.addActionListener(event -> navigateToPanel("Calculator"));
-    exitButton.addActionListener(event -> confirmExit());
+    JPanel buttonPanel = new JPanel(new GridLayout(5, 4, 10, 10));
+    String[] buttons = {
+        "7", "8", "9", "/", 
+        "4", "5", "6", "*", 
+        "1", "2", "3", "-", 
+        "0", ".", "=", "+", 
+        "1/x", "C"
+    };
 
-    mainMenuPanel.add(financeTrackerButton);
-    mainMenuPanel.add(calculatorButton);
-    mainMenuPanel.add(exitButton);
+    ActionListener calculatorListener = new ActionListener() {
+        private String operator = "";
+        private double operand1 = 0, operand2 = 0;
 
-    return mainMenuPanel;
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String command = e.getActionCommand();
+            if (command.matches("\\d|\\.")) {
+                display.setText(display.getText() + command);
+            } else if (command.equals("C")) {
+                display.setText("");
+                operator = "";
+                operand1 = operand2 = 0;
+            } else if (command.equals("=")) {
+                operand2 = Double.parseDouble(display.getText());
+                switch (operator) {
+                    case "+":
+                        display.setText(String.valueOf(operand1 + operand2));
+                        break;
+                    case "-":
+                        display.setText(String.valueOf(operand1 - operand2));
+                        break;
+                    case "*":
+                        display.setText(String.valueOf(operand1 * operand2));
+                        break;
+                    case "/":
+                        display.setText(operand2 != 0 ? String.valueOf(operand1 / operand2) : "Error");
+                        break;
+                    default:
+                        display.setText("Error");
+                }
+            } else if (command.equals("1/x")) {
+                double value = Double.parseDouble(display.getText());
+                display.setText(value != 0 ? String.valueOf(1 / value) : "Error");
+            } else {
+                operand1 = Double.parseDouble(display.getText());
+                operator = command;
+                display.setText("");
+            }
+        }
+    };
+
+    for (String text : buttons) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Arial", Font.BOLD, 20));
+        button.addActionListener(calculatorListener);
+        buttonPanel.add(button);
+    }
+
+    JButton backToMenuButton = createHoverableButton("Back to Main Menu");
+    backToMenuButton.addActionListener(event -> navigateToPanel("Main Menu"));
+
+    calculatorPanel.add(display, BorderLayout.NORTH);
+    calculatorPanel.add(buttonPanel, BorderLayout.CENTER);
+    calculatorPanel.add(backToMenuButton, BorderLayout.SOUTH);
+
+    return calculatorPanel;
 }
