@@ -1,57 +1,92 @@
-import javax.swing.*; // Provides classes for building a GUI, e.g., JFrame, JButton
-import javax.swing.border.TitledBorder; // Enables titled borders around panels
-import java.awt.*; // Provides layout managers and UI styling components
-import java.awt.event.*; // Handles events such as button clicks
-import java.util.ArrayList; // Implements a dynamic resizable array for storing data
+private void calculateTotals() { // Calculates the total amount spent
+    double total = 0; // Initializes total to 0
 
-public class FinanceTrackerApp { // Defines the main class of the Finance Tracker application
-    private JFrame mainFrame; // Main application window
-    private JPanel contentPanel; // Container to hold different panels for navigation
-    private CardLayout panelSwitcher; // Manages panel switching within contentPanel
+    for (JPanel section : expenseSections) { // Loops through each expense section
+        Component[] components = section.getComponents(); // Gets components of the section
+        String amount = ((JTextField) components[5]).getText(); // Retrieves money spent input
 
-    private ArrayList<JPanel> expenseSections; // Stores individual expense sections dynamically
-    private JPanel trackerDetailsPanel; // Panel to display all expense sections in a scrollable view
-
-    public FinanceTrackerApp() { // Constructor to initialize the application's GUI components
-        mainFrame = new JFrame("Finance Tracker"); // Creates the main application window
-        Image icon = Toolkit.getDefaultToolkit().getImage( // Loads the application icon
-        new java.io.File("C:\\ElexisEonClark\\College\\College gawain\\Second Year\\Object Oriented Programming\\Project\\resources\\LogoFinance.png").getAbsolutePath());
-        mainFrame.setIconImage(icon); // Sets the application icon
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Closes the app on exit
-        mainFrame.setSize(650, 400); // Sets the size of the main frame
-        mainFrame.setLayout(new BorderLayout()); // Sets the layout manager for the main frame
-
-        panelSwitcher = new CardLayout(); // Initializes the CardLayout for switching panels
-        contentPanel = new JPanel(panelSwitcher); // Creates the content panel with CardLayout
-
-        JPanel menuPanel = createMainMenuPanel(); // Creates the main menu panel
-        JPanel financeTrackerPanel = createFinanceTrackerPanel(); // Creates the finance tracker panel
-        JPanel calculatorPanel = createCalculatorPanel(); // Creates the calculator panel
-
-        contentPanel.add(menuPanel, "Main Menu"); // Adds the main menu to the content panel
-        contentPanel.add(financeTrackerPanel, "Finance Tracker"); // Adds the tracker panel
-        contentPanel.add(calculatorPanel, "Calculator"); // Adds the calculator panel
-
-        mainFrame.add(contentPanel, BorderLayout.CENTER); // Adds contentPanel to the frame
-        mainFrame.setVisible(true); // Makes the main frame visible
+        try { // Attempts to parse the amount to a double
+            total += Double.parseDouble(amount); // Adds the amount to the total
+        } catch (NumberFormatException e) { // If parsing fails
+            JOptionPane.showMessageDialog(mainFrame, "Invalid number format for money spent.", "Error", JOptionPane.ERROR_MESSAGE); // Displays error
+        }
     }
 
-    private JPanel createMainMenuPanel() { // Creates the main menu panel
-        JPanel mainMenuPanel = new JPanel(); // Initializes the main menu panel
-        mainMenuPanel.setLayout(new GridLayout(3, 1, 10, 10)); // Sets a grid layout for buttons
-        mainMenuPanel.setBackground(new Color(30, 30, 30)); // Sets the background color
+    JOptionPane.showMessageDialog(mainFrame, "Total Expenses: Php " + total, "Calculation", JOptionPane.INFORMATION_MESSAGE); // Displays the total
+}
 
-        JButton financeTrackerButton = createHoverableButton("Track My Finances"); // Button for finance tracker
-        JButton calculatorButton = createHoverableButton("Calculate on your Own"); // Button for calculator
-        JButton exitButton = createHoverableButton("Exit"); // Button to exit the app
+private JPanel createCalculatorPanel() { // Creates the calculator panel
+    JPanel calculatorPanel = new JPanel(new BorderLayout()); // Panel layout for the calculator
 
-        financeTrackerButton.addActionListener(event -> navigateToPanel("Finance Tracker")); // Navigates to tracker
-        calculatorButton.addActionListener(event -> navigateToPanel("Calculator")); // Navigates to calculator
-        exitButton.addActionListener(event -> confirmExit()); // Exits the application
+    JTextField display = new JTextField(); // Text field to show calculator input/output
+    display.setEditable(false); // Prevents user from directly editing the display
+    display.setHorizontalAlignment(JTextField.RIGHT); // Aligns text to the right
+    display.setFont(new Font("Arial", Font.BOLD, 24)); // Sets font for the display
 
-        mainMenuPanel.add(financeTrackerButton); // Adds the tracker button to the menu
-        mainMenuPanel.add(calculatorButton); // Adds the calculator button
-        mainMenuPanel.add(exitButton); // Adds the exit button
+    JPanel buttonPanel = new JPanel(new GridLayout(5, 4, 10, 10)); // Grid layout for calculator buttons
+    String[] buttons = { // Array of calculator button labels
+            "7", "8", "9", "/", 
+            "4", "5", "6", "*", 
+            "1", "2", "3", "-", 
+            "0", ".", "=", "+", 
+            "1/x", "C"
+    };
 
-        return mainMenuPanel; // Returns the main menu panel
+    ActionListener calculatorListener = new ActionListener() { // ActionListener for calculator buttons
+        private String operator = ""; // Stores the selected operator
+        private double operand1 = 0, operand2 = 0; // Stores operands
+
+        @Override
+        public void actionPerformed(ActionEvent e) { // Handles button clicks
+            String command = e.getActionCommand(); // Gets the button text
+            if (command.matches("\\d|\\.")) { // If it's a number or a dot
+                display.setText(display.getText() + command); // Appends the digit to the display
+            } else if (command.equals("C")) { // Clears the calculator
+                display.setText(""); // Resets the display
+                operator = ""; // Resets the operator
+                operand1 = operand2 = 0; // Resets operands
+            } else if (command.equals("=")) { // Executes the calculation
+                operand2 = Double.parseDouble(display.getText()); // Parses the second operand
+                switch (operator) { // Performs the operation based on the operator
+                    case "+":
+                        display.setText(String.valueOf(operand1 + operand2)); // Adds
+                        break;
+                    case "-":
+                        display.setText(String.valueOf(operand1 - operand2)); // Subtracts
+                        break;
+                    case "*":
+                        display.setText(String.valueOf(operand1 * operand2)); // Multiplies
+                        break;
+                    case "/":
+                        display.setText(operand2 != 0 ? String.valueOf(operand1 / operand2) : "Error"); // Divides, checks for zero
+                        break;
+                    default:
+                        display.setText("Error"); // Displays error for invalid operator
+                        break;
+                }
+            } else if (command.equals("1/x")) { // Calculates reciprocal
+                double value = Double.parseDouble(display.getText()); // Parses the display value
+                display.setText(value != 0 ? String.valueOf(1 / value) : "Error"); // Calculates reciprocal or shows error
+            } else { // Handles operator input
+                operand1 = Double.parseDouble(display.getText()); // Parses the first operand
+                operator = command; // Stores the operator
+                display.setText(""); // Clears the display for the next input
+            }
+        }
+    };
+
+    for (String text : buttons) { // Creates and adds buttons to the panel
+        JButton button = new JButton(text); // Creates a button with the label
+        button.setFont(new Font("Arial", Font.BOLD, 20)); // Sets the font for the button
+        button.addActionListener(calculatorListener); // Adds the ActionListener
+        buttonPanel.add(button); // Adds the button to the panel
     }
+
+    JButton backToMenuButton = createHoverableButton("Back to Main Menu"); // Button to return to main menu
+    backToMenuButton.addActionListener(event -> navigateToPanel("Main Menu")); // Navigates to the main menu
+
+    calculatorPanel.add(display, BorderLayout.NORTH); // Adds the display to the top
+    calculatorPanel.add(buttonPanel, BorderLayout.CENTER); // Adds the buttons to the center
+    calculatorPanel.add(backToMenuButton, BorderLayout.SOUTH); // Adds the back button to the bottom
+
+    return calculatorPanel; // Returns the calculator panel
